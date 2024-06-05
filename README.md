@@ -47,8 +47,3 @@ spark-shell --master yarn --deploy-mode client
 ```bash
 spark-submit --master yarn --deploy-mode client --num-executors 2 --executor-memory 4G --executor-cores 4 --class org.apache.spark.examples.SparkPi $SPARK_HOME/examples/jars/spark-examples_2.11-2.4.1.jar
 ```
-- Access to hdfs Web UI : `master-node-ip:50070`
-
-
-
-
