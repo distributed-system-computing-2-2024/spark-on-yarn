@@ -23,7 +23,7 @@ done
 # START HADOOP MASTER
 
 HADOOP_MASTER="$HOST_PREFIX"-master
-docker run --name $HADOOP_MASTER -h $HADOOP_MASTER --net=$NETWORK_NAME \
+docker run --name $HADOOP_MASTER -v /Users/jun/Desktop/hadoop/docker-spark-yarn-cluster/src:/src -h $HADOOP_MASTER --net=$NETWORK_NAME \
 		-p  8088:8088  -p 50070:50070 -p 50090:50090 \
 		-p  8080:8080 \
 		-itd "$IMG_NAME"
