@@ -25,6 +25,7 @@ RUN rm /spark.tar.gz
 
 ENV HADOOP_HOME=/usr/local/hadoop
 ENV SPARK_HOME=/usr/local/spark
+ENV PYSPARK_PYTHON=/usr/bin/python3
 ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$SPARK_HOME/bin:$SPARK_HOME:sbin
 
 RUN mkdir -p $HADOOP_HOME/hdfs/namenode \
@@ -45,11 +46,17 @@ RUN mv /tmp/ssh_config $HOME/.ssh/config \
     && mv /tmp/spark/log4j.properties $SPARK_HOME/conf/log4j.properties \
     && mv /tmp/spark/spark.defaults.conf $SPARK_HOME/conf/spark.defaults.conf
 
+RUN su
+RUN apt update
+RUN apt install -y python3-pip
+RUN pip3 install findspark
+RUN hdfs namenode -format
+
 ADD scripts/spark-services.sh $HADOOP_HOME/spark-services.sh
 
 RUN chmod 744 -R $HADOOP_HOME
 
-EXPOSE 50010 50020 50070 50075 50090 8020 9000
+EXPOSE 50010 50020 50070 50075 50090 8020 9000 9042
 EXPOSE 10020 19888
 EXPOSE 8030 8031 8032 8033 8040 8042 8088
 EXPOSE 49707 2122 7001 7002 7003 7004 7005 7006 7007 8888 9000
