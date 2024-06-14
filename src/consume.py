@@ -6,7 +6,6 @@ from pyspark.sql.types import StructType, StructField, StringType
 findspark.init()
 
 if __name__ == "__main__":
-
     # SparkSession 생성
     spark = SparkSession.builder \
         .appName('SparkKafkaCassandraApp') \
@@ -57,11 +56,12 @@ if __name__ == "__main__":
         col("stdDate").alias("std_date"),
         col("stdHour").alias("std_hour"),
         expr("CASE "
-            "WHEN CAST(speed AS INT) >= 80 THEN 'low' "
-            "WHEN CAST(speed AS INT) BETWEEN 30 AND 79 THEN 'middle' "
-            "ELSE 'high' "
-            "END").alias("congestion_level")
+             "WHEN CAST(speed AS INT) >= 80 THEN 'low' "
+             "WHEN CAST(speed AS INT) BETWEEN 30 AND 79 THEN 'middle' "
+             "ELSE 'high' "
+             "END").alias("congestion_level")
     )
+
 
     def foreach_batch_function(batch_df, batch_id):
         batch_df.write \
@@ -69,6 +69,7 @@ if __name__ == "__main__":
             .options(table="road", keyspace="dsc2024") \
             .mode("append") \
             .save()
+
 
     # Cassandra에 데이터 저장
     query2 = transformed_df.writeStream \
