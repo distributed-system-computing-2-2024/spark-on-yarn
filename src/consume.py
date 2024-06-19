@@ -13,7 +13,7 @@ if __name__ == "__main__":
         .config("spark.cassandra.connection.port", "9042") \
         .getOrCreate()
 
-    # Kafka 메시지 스키마 정의
+    # Kafka 메시지 JSON 스키마 정의
     schema = StructType([
         StructField("stdHour", StringType(), True),
         StructField("routeNo", StringType(), True),
@@ -38,18 +38,19 @@ if __name__ == "__main__":
         .option("failOnDataLoss", "false") \
         .load()
 
-    df = kafka_df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
 
     # JSON 형식의 value를 파싱하여 데이터 프레임으로 변환
+    df = kafka_df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
     parsed_df = df.withColumn("Body", from_json(col("value"), schema)).select(col("Body.*"))
 
-    # 결과 출력
+    # 콘솔 결과 출력 (이부분은 발표자료 필요없음)
     query = parsed_df.writeStream \
         .outputMode("append") \
         .format("console") \
         .option("truncate", "false") \
         .start()
 
+    # Cassandra 스키마에 맞춰 변환
     transformed_df = parsed_df.select(
         col("vdsId").alias("road_id"),
         col("conzoneName").alias("road_name"),
@@ -62,7 +63,7 @@ if __name__ == "__main__":
              "END").alias("congestion_level")
     )
 
-
+    # Cassandra 배치 작업 함수
     def foreach_batch_function(batch_df, batch_id):
         batch_df.write \
             .format("org.apache.spark.sql.cassandra") \
